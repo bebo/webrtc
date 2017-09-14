@@ -2640,6 +2640,8 @@ std::vector<webrtc::VideoStream> EncoderStreamFactory::CreateEncoderStreams(
   if (CodecNamesEq(codec_name_, kVp9CodecName) && !is_screencast_) {
     stream.temporal_layer_thresholds_bps.resize(GetDefaultVp9TemporalLayers() -
                                                 1);
+  } else if (CodecNamesEq(codec_name_, kVp8CodecName) && !is_screencast_) {
+    stream.temporal_layer_thresholds_bps.resize(1);
   }
 
   std::vector<webrtc::VideoStream> streams;
