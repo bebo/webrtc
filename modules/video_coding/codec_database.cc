@@ -17,24 +17,81 @@
 #include "webrtc/modules/video_coding/internal_defines.h"
 #include "webrtc/rtc_base/checks.h"
 #include "webrtc/rtc_base/logging.h"
+#include "webrtc/rtc_base/win_registry.h"
 
 namespace {
 const size_t kDefaultPayloadSize = 1440;
 const uint8_t kDefaultPayloadType = 100;
 }
 
+using bebo::base::win::RegKey;
+
 namespace webrtc {
 
 VideoCodecVP8 VideoEncoder::GetDefaultVp8Settings() {
+  RegKey beboKey(HKEY_CURRENT_USER, L"SOFTWARE\\Bebo\\App", KEY_READ);
   VideoCodecVP8 vp8_settings;
   memset(&vp8_settings, 0, sizeof(vp8_settings));
 
+  vp8_settings.denoisingOn = true;
+  vp8_settings.denoiserState = kDenoiserOnAdaptive;
+
+  vp8_settings.frameDroppingOn = true;
+  vp8_settings.frameDroppingThreshold = 60;
+
+  vp8_settings.automaticResizeOn = false;
+
+  vp8_settings.undershootPct = 100;
+  vp8_settings.overshootPct = 15;
+
+  if (beboKey.Valid()) {
+    if (beboKey.HasValue(L"VP8Complexity")) {
+       DWORD value = 0;
+       beboKey.ReadValueDW(L"VP8Complexity", &value);
+       LOG(INFO) << "VP8 complexity: " << value << " was: " << vp8_settings.complexity;
+       vp8_settings.complexity = static_cast<VideoCodecComplexity>(value);
+    }
+    if (beboKey.HasValue(L"VP8DenoiserState")) {
+       DWORD value = 0;
+       beboKey.ReadValueDW(L"VP8DenoiserState", &value);
+       LOG(INFO) << "VP8DenoiserState: " << value << " was: " << vp8_settings.denoiserState; 
+       vp8_settings.denoiserState = static_cast<VP8DenoiserState>(value);
+    }
+    if (beboKey.HasValue(L"VP8FrameDroppingOn")) {
+       DWORD value = 0;
+       beboKey.ReadValueDW(L"VP8FrameDroppingOn", &value);
+       LOG(INFO) << "VP8FrameDroppingOn: " << value << " was: " << vp8_settings.frameDroppingOn; 
+       vp8_settings.frameDroppingOn = value > 0;
+    }
+    if (beboKey.HasValue(L"VP8FrameDroppingThreshold")) {
+       DWORD value = 0;
+       beboKey.ReadValueDW(L"VP8FrameDroppingThreshold", &value);
+       LOG(INFO) << "VP8FrameDroppingThreshold: " << value << " was: " << vp8_settings.frameDroppingThreshold; 
+       vp8_settings.frameDroppingThreshold = (int) value;
+    }
+    if (beboKey.HasValue(L"VP8AutomaticResizeOn")) {
+       DWORD value = 0;
+       beboKey.ReadValueDW(L"VP8AutomaticResizeOn", &value);
+       LOG(INFO) << "VP8AutomaticResizeOn: " << value << " was: " << vp8_settings.automaticResizeOn; 
+       vp8_settings.automaticResizeOn = value > 0;
+    }
+    if (beboKey.HasValue(L"VP8OvershootPct")) {
+       DWORD value = 0;
+       beboKey.ReadValueDW(L"VP8OvershootPct", &value);
+       LOG(INFO) << "VP8OvershootPct: " << value << " was: " << vp8_settings.overshootPct; 
+       vp8_settings.overshootPct= value > 0;
+    }
+    if (beboKey.HasValue(L"VP8UndershootPct")) {
+       DWORD value = 0;
+       beboKey.ReadValueDW(L"VP8UndershootPct", &value);
+       LOG(INFO) << "VP8UndershootPct: " << value << " was: " << vp8_settings.undershootPct; 
+       vp8_settings.undershootPct= value > 0;
+    }
+  }
+
   vp8_settings.resilience = kResilientStream;
   vp8_settings.numberOfTemporalLayers = 1;
-  vp8_settings.denoisingOn = true;
   vp8_settings.errorConcealmentOn = false;
-  vp8_settings.automaticResizeOn = false;
-  vp8_settings.frameDroppingOn = true;
   vp8_settings.keyFrameInterval = 3000;
 
   return vp8_settings;

@@ -196,7 +196,7 @@ rtc_static_library("rtc_base_approved") {
   }
 
   if (is_win) {
-    sources += [ "file_win.cc" ]
+    sources += [ "file_win.cc", "win_registry.cc" ]
   }
 
   if (build_with_chromium) {
