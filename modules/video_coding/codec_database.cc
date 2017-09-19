@@ -35,60 +35,11 @@ VideoCodecVP8 VideoEncoder::GetDefaultVp8Settings() {
 
   vp8_settings.denoisingOn = true;
   vp8_settings.denoiserState = kDenoiserOnAdaptive;
-
   vp8_settings.frameDroppingOn = true;
   vp8_settings.frameDroppingThreshold = 60;
-
   vp8_settings.automaticResizeOn = false;
-
   vp8_settings.undershootPct = 100;
   vp8_settings.overshootPct = 15;
-
-  if (beboKey.Valid()) {
-    if (beboKey.HasValue(L"VP8Complexity")) {
-       DWORD value = 0;
-       beboKey.ReadValueDW(L"VP8Complexity", &value);
-       LOG(INFO) << "VP8 complexity: " << value << " was: " << vp8_settings.complexity;
-       vp8_settings.complexity = static_cast<VideoCodecComplexity>(value);
-    }
-    if (beboKey.HasValue(L"VP8DenoiserState")) {
-       DWORD value = 0;
-       beboKey.ReadValueDW(L"VP8DenoiserState", &value);
-       LOG(INFO) << "VP8DenoiserState: " << value << " was: " << vp8_settings.denoiserState; 
-       vp8_settings.denoiserState = static_cast<VP8DenoiserState>(value);
-    }
-    if (beboKey.HasValue(L"VP8FrameDroppingOn")) {
-       DWORD value = 0;
-       beboKey.ReadValueDW(L"VP8FrameDroppingOn", &value);
-       LOG(INFO) << "VP8FrameDroppingOn: " << value << " was: " << vp8_settings.frameDroppingOn; 
-       vp8_settings.frameDroppingOn = value > 0;
-    }
-    if (beboKey.HasValue(L"VP8FrameDroppingThreshold")) {
-       DWORD value = 0;
-       beboKey.ReadValueDW(L"VP8FrameDroppingThreshold", &value);
-       LOG(INFO) << "VP8FrameDroppingThreshold: " << value << " was: " << vp8_settings.frameDroppingThreshold; 
-       vp8_settings.frameDroppingThreshold = (int) value;
-    }
-    if (beboKey.HasValue(L"VP8AutomaticResizeOn")) {
-       DWORD value = 0;
-       beboKey.ReadValueDW(L"VP8AutomaticResizeOn", &value);
-       LOG(INFO) << "VP8AutomaticResizeOn: " << value << " was: " << vp8_settings.automaticResizeOn; 
-       vp8_settings.automaticResizeOn = value > 0;
-    }
-    if (beboKey.HasValue(L"VP8OvershootPct")) {
-       DWORD value = 0;
-       beboKey.ReadValueDW(L"VP8OvershootPct", &value);
-       LOG(INFO) << "VP8OvershootPct: " << value << " was: " << vp8_settings.overshootPct; 
-       vp8_settings.overshootPct= value > 0;
-    }
-    if (beboKey.HasValue(L"VP8UndershootPct")) {
-       DWORD value = 0;
-       beboKey.ReadValueDW(L"VP8UndershootPct", &value);
-       LOG(INFO) << "VP8UndershootPct: " << value << " was: " << vp8_settings.undershootPct; 
-       vp8_settings.undershootPct= value > 0;
-    }
-  }
-
   vp8_settings.resilience = kResilientStream;
   vp8_settings.numberOfTemporalLayers = 1;
   vp8_settings.errorConcealmentOn = false;
@@ -105,11 +56,18 @@ VideoCodecVP9 VideoEncoder::GetDefaultVp9Settings() {
   vp9_settings.numberOfTemporalLayers = 1;
   vp9_settings.denoisingOn = true;
   vp9_settings.frameDroppingOn = true;
+  vp9_settings.frameDroppingThreshold = 60;
   vp9_settings.keyFrameInterval = 3000;
   vp9_settings.adaptiveQpMode = true;
+  vp9_settings.tuneContentScreen = false;
   vp9_settings.automaticResizeOn = true;
   vp9_settings.numberOfSpatialLayers = 1;
   vp9_settings.flexibleMode = false;
+
+  vp9_settings.undershootPct = 50;
+  vp9_settings.overshootPct = 50;
+  vp9_settings.cpuUsed = 7;
+
   return vp9_settings;
 }
 
