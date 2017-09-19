@@ -499,10 +499,15 @@ struct VideoCodecVP9 {
   unsigned char numberOfTemporalLayers;
   bool denoisingOn;
   bool frameDroppingOn;
+  int frameDroppingThreshold;
   int keyFrameInterval;
   bool adaptiveQpMode;
   bool automaticResizeOn;
+  bool tuneContentScreen;
   unsigned char numberOfSpatialLayers;
+  int undershootPct;
+  int overshootPct;
+  int cpuUsed;
   bool flexibleMode;
 };
 
