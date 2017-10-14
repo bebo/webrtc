@@ -105,6 +105,7 @@ class WebRtcSimulcastEncoderFactory
   }
 
   const std::vector<cricket::VideoCodec>& supported_codecs() const override {
+    LOG(LS_INFO) << "fpn " << __func__;
     return factory_->supported_codecs();
   }
 
@@ -136,6 +137,7 @@ class WebRtcSimulcastEncoderFactory
 };
 
 void AddDefaultFeedbackParams(VideoCodec* codec) {
+  /* codec->AddFeedbackParam(FeedbackParam( */
   codec->AddFeedbackParam(FeedbackParam(kRtcpFbParamCcm, kRtcpFbCcmParamFir));
   codec->AddFeedbackParam(FeedbackParam(kRtcpFbParamNack, kParamValueEmpty));
   codec->AddFeedbackParam(FeedbackParam(kRtcpFbParamNack, kRtcpFbNackParamPli));
@@ -521,6 +523,7 @@ WebRtcVideoChannel* WebRtcVideoEngine::CreateChannel(
 }
 
 std::vector<VideoCodec> WebRtcVideoEngine::codecs() const {
+  LOG(LS_INFO) << "fpn " << __func__;
   return GetSupportedCodecs(external_encoder_factory_);
 }
 
@@ -559,6 +562,7 @@ void WebRtcVideoEngine::SetExternalDecoderFactory(
 
 void WebRtcVideoEngine::SetExternalEncoderFactory(
     WebRtcVideoEncoderFactory* encoder_factory) {
+  LOG(LS_INFO) << "fpn " << __func__;
   RTC_DCHECK(!initialized_);
   if (external_encoder_factory_ == encoder_factory)
     return;
@@ -606,6 +610,7 @@ static rtc::Optional<int> NextFreePayloadType(
 // recognized codecs (VP8, VP9, H264, and RED).
 static void AppendVideoCodecs(const std::vector<VideoCodec>& input_codecs,
                               std::vector<VideoCodec>* unified_codecs) {
+  LOG(LS_INFO) << "fpn " << __func__;
   for (VideoCodec codec : input_codecs) {
     const rtc::Optional<int> payload_type =
         NextFreePayloadType(*unified_codecs);
@@ -642,6 +647,7 @@ static void AppendVideoCodecs(const std::vector<VideoCodec>& input_codecs,
 
 static std::vector<VideoCodec> GetSupportedCodecs(
     const WebRtcVideoEncoderFactory* external_encoder_factory) {
+  LOG(LS_INFO) << "fpn " << __func__;
   const std::vector<VideoCodec> internal_codecs =
       InternalEncoderFactory().supported_codecs();
   LOG(LS_INFO) << "Internally supported codecs: "
@@ -1622,6 +1628,9 @@ WebRtcVideoChannel::WebRtcVideoSendStream::AllocatedEncoder::AllocatedEncoder(
       external_encoder(nullptr),
       codec(codec),
       external(external) {
+  std::string name;
+  codec.GetParam("codecImplementationName", &name);
+  LOG(LS_INFO) << "fpn AllocatedEncoder " << name;
   if (external) {
     external_encoder = encoder;
     this->encoder =
@@ -1787,6 +1796,7 @@ WebRtcVideoChannel::WebRtcVideoSendStream::CreateVideoEncoder(
     const VideoCodec& codec,
     bool force_encoder_allocation) {
   RTC_DCHECK_RUN_ON(&thread_checker_);
+  LOG(LS_INFO) << "fpn CreateVideoEncoder";
   // Do not re-create encoders of the same type.
   if (!force_encoder_allocation && codec == allocated_encoder_.codec &&
       allocated_encoder_.encoder != nullptr) {
@@ -2095,6 +2105,7 @@ void WebRtcVideoChannel::WebRtcVideoSendStream::AddOrUpdateSink(
 
 VideoSenderInfo WebRtcVideoChannel::WebRtcVideoSendStream::GetVideoSenderInfo(
     bool log_stats) {
+  LOG(LS_INFO) << "fpn WebRtcVideoChannel::WebRtcVideoSendStream::GetVideoSenderInfo ";
   VideoSenderInfo info;
   RTC_DCHECK_RUN_ON(&thread_checker_);
   for (uint32_t ssrc : parameters_.config.rtp.ssrcs)

@@ -73,6 +73,7 @@ cricket::MediaEngineInterface* CreateWebRtcMediaEngine(
     cricket::WebRtcVideoDecoderFactory* video_decoder_factory,
     rtc::scoped_refptr<webrtc::AudioMixer> audio_mixer,
     rtc::scoped_refptr<webrtc::AudioProcessing> audio_processing) {
+  LOG(LS_INFO) << "fpn CreateWebRtcMediaEngine";
   return new cricket::WebRtcMediaEngine2(
       adm, audio_encoder_factory, audio_decoder_factory, video_encoder_factory,
       video_decoder_factory, audio_mixer, audio_processing);

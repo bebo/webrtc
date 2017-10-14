@@ -274,6 +274,7 @@ void ExtractStats(const cricket::VideoReceiverInfo& info, StatsReport* report) {
 
 void ExtractStats(const cricket::VideoSenderInfo& info, StatsReport* report) {
   ExtractCommonSendProperties(info, report);
+  LOG(INFO) << "fpn ExtractStats " << info.encoder_implementation_name;
 
   report->AddString(StatsReport::kStatsValueNameCodecImplementationName,
                     info.encoder_implementation_name);

@@ -31,6 +31,7 @@ VideoEncoderSoftwareFallbackWrapper::VideoEncoderSoftwareFallbackWrapper(
       callback_(nullptr) {}
 
 bool VideoEncoderSoftwareFallbackWrapper::InitFallbackEncoder() {
+  LOG(LS_WARNING) << "Encoder falling back to software encoding.";
   cricket::InternalEncoderFactory internal_factory;
   if (!FindMatchingCodec(internal_factory.supported_codecs(), codec_)) {
     LOG(LS_WARNING)
@@ -171,8 +172,13 @@ VideoEncoderSoftwareFallbackWrapper::GetScalingSettings() const {
 }
 
 const char *VideoEncoderSoftwareFallbackWrapper::ImplementationName() const {
-  if (fallback_encoder_)
+  if (fallback_encoder_) {
+  LOG(LS_INFO) << "fpn ImplementationName fallback_encoder" << fallback_encoder_->ImplementationName();
     return fallback_encoder_->ImplementationName();
+  }
+
+  LOG(LS_INFO) << "fpn ImplementationName" << encoder_->ImplementationName();
+
   return encoder_->ImplementationName();
 }
 
