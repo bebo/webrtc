@@ -304,6 +304,7 @@ int32_t VideoSender::RegisterProtectionCallback(
 // Add one raw video frame to the encoder, blocking.
 int32_t VideoSender::AddVideoFrame(const VideoFrame& videoFrame,
                                    const CodecSpecificInfo* codecSpecificInfo) {
+  LOG(LS_INFO) << "fpn webrtc VideoSender::AddVideoFrame";
   EncoderParameters encoder_params;
   std::vector<FrameType> next_frame_types;
   bool encoder_has_internal_source = false;

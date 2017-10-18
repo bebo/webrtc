@@ -28,10 +28,13 @@ VideoEncoderSoftwareFallbackWrapper::VideoEncoderSoftwareFallbackWrapper(
       rtt_(0),
       codec_(codec),
       encoder_(encoder),
-      callback_(nullptr) {}
+      callback_(nullptr) {
+        LOG(LS_INFO) << "fpn webrtc" << "VideoEncoderSoftwareFallbackWrapper::VideoEncoderSoftwareFallbackWrapper";
+      }
 
 bool VideoEncoderSoftwareFallbackWrapper::InitFallbackEncoder() {
   cricket::InternalEncoderFactory internal_factory;
+  LOG(LS_WARNING) << "Encoder falling back to software encoding.";
   if (!FindMatchingCodec(internal_factory.supported_codecs(), codec_)) {
     LOG(LS_WARNING)
         << "Encoder requesting fallback to codec not supported in software.";

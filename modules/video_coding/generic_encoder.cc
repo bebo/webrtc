@@ -32,7 +32,9 @@ VCMGenericEncoder::VCMGenericEncoder(
       internal_source_(internal_source),
       encoder_params_({BitrateAllocation(), 0, 0, 0}),
       is_screenshare_(false),
-      streams_or_svc_num_(0) {}
+      streams_or_svc_num_(0) {
+    LOG(LS_INFO) << "fpn VCMGenericEncoder constructor";
+      }
 
 VCMGenericEncoder::~VCMGenericEncoder() {}
 
@@ -47,6 +49,7 @@ int32_t VCMGenericEncoder::InitEncode(const VideoCodec* settings,
                                       size_t max_payload_size) {
   RTC_DCHECK_RUNS_SERIALIZED(&race_checker_);
   TRACE_EVENT0("webrtc", "VCMGenericEncoder::InitEncode");
+  LOG(LS_INFO) << "fpn webrtc" << "VCMGenericEncoder::InitEncode";
   is_screenshare_ = settings->mode == VideoCodecMode::kScreensharing;
   streams_or_svc_num_ = settings->numberOfSimulcastStreams;
   if (settings->codecType == kVideoCodecVP9) {
@@ -75,6 +78,7 @@ int32_t VCMGenericEncoder::Encode(const VideoFrame& frame,
   RTC_DCHECK_RUNS_SERIALIZED(&race_checker_);
   TRACE_EVENT1("webrtc", "VCMGenericEncoder::Encode", "timestamp",
                frame.timestamp());
+  LOG(LS_INFO) << "fpn webrtc" << "VCMGenericEncoder::Encode  timestamp" << frame.timestamp();
 
   for (FrameType frame_type : frame_types)
     RTC_DCHECK(frame_type == kVideoFrameKey || frame_type == kVideoFrameDelta);
@@ -96,6 +100,7 @@ void VCMGenericEncoder::SetEncoderParameters(const EncoderParameters& params) {
   RTC_DCHECK_RUNS_SERIALIZED(&race_checker_);
   bool channel_parameters_have_changed;
   bool rates_have_changed;
+  LOG(LS_INFO) << "fpn webrtc" << "VCMGenericEncoder::SetEncoderParameters";
   {
     rtc::CritScope lock(&params_lock_);
     channel_parameters_have_changed =
