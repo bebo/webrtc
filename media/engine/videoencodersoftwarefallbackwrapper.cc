@@ -31,6 +31,7 @@ VideoEncoderSoftwareFallbackWrapper::VideoEncoderSoftwareFallbackWrapper(
       callback_(nullptr) {}
 
 bool VideoEncoderSoftwareFallbackWrapper::InitFallbackEncoder() {
+  LOG(LS_WARNING) << "Encoder falling back to software encoding.";
   cricket::InternalEncoderFactory internal_factory;
   if (!FindMatchingCodec(internal_factory.supported_codecs(), codec_)) {
     LOG(LS_WARNING)
