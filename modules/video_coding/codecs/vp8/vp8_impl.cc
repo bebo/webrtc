@@ -36,6 +36,10 @@
 #include "webrtc/system_wrappers/include/clock.h"
 #include "webrtc/system_wrappers/include/field_trial.h"
 #include "webrtc/system_wrappers/include/metrics.h"
+#include "webrtc/rtc_base/win_registry.h"
+#include "webrtc/rtc_base/logging.h"
+
+using bebo::base::win::RegKey;
 
 namespace webrtc {
 namespace {
@@ -49,16 +53,6 @@ const int kTokenPartitions = VP8_ONE_TOKENPARTITION;
 enum { kVp8ErrorPropagationTh = 30 };
 enum { kVp832ByteAlign = 32 };
 
-// VP8 denoiser states.
-enum denoiserState {
-  kDenoiserOff,
-  kDenoiserOnYOnly,
-  kDenoiserOnYUV,
-  kDenoiserOnYUVAggressive,
-  // Adaptive mode defaults to kDenoiserOnYUV on key frame, but may switch
-  // to kDenoiserOnYUVAggressive based on a computed noise metric.
-  kDenoiserOnAdaptive
-};
 
 // Greatest common divisior
 int GCD(int a, int b) {
@@ -468,7 +462,7 @@ int VP8EncoderImpl::InitEncode(const VideoCodec* inst,
   }
 
   // rate control settings
-  configurations_[0].rc_dropframe_thresh = inst->VP8().frameDroppingOn ? 30 : 0;
+  configurations_[0].rc_dropframe_thresh = inst->VP8().frameDroppingOn ? inst->VP8().frameDroppingThreshold : 0;
   configurations_[0].rc_end_usage = VPX_CBR;
   configurations_[0].g_pass = VPX_RC_ONE_PASS;
   // Handle resizing outside of libvpx.
@@ -478,8 +472,8 @@ int VP8EncoderImpl::InitEncode(const VideoCodec* inst,
     qp_max_ = inst->qpMax;
   }
   configurations_[0].rc_max_quantizer = qp_max_;
-  configurations_[0].rc_undershoot_pct = 100;
-  configurations_[0].rc_overshoot_pct = 15;
+  configurations_[0].rc_undershoot_pct = inst->VP8().undershootPct;
+  configurations_[0].rc_overshoot_pct = inst->VP8().overshootPct;
   configurations_[0].rc_buf_initial_sz = 500;
   configurations_[0].rc_buf_optimal_sz = 600;
   configurations_[0].rc_buf_sz = 1000;
@@ -493,6 +487,7 @@ int VP8EncoderImpl::InitEncode(const VideoCodec* inst,
   } else {
     configurations_[0].kf_mode = VPX_KF_DISABLED;
   }
+  LOG(INFO) << "VP8 complexity: " << inst->VP8().complexity ;
 
   // Allow the user to set the complexity for the base stream.
   switch (inst->VP8().complexity) {
@@ -653,12 +648,13 @@ int VP8EncoderImpl::InitAndSetControlSettings() {
   // for getting the denoised frame from the encoder and using that
   // when encoding lower resolution streams. Would it work with the
   // multi-res encoding feature?
-  denoiserState denoiser_state = kDenoiserOnYOnly;
-#if defined(WEBRTC_ARCH_ARM) || defined(WEBRTC_ARCH_ARM64) || defined(ANDROID)
-  denoiser_state = kDenoiserOnYOnly;
-#else
-  denoiser_state = kDenoiserOnAdaptive;
-#endif
+  VP8DenoiserState denoiser_state = codec_.VP8()->denoiserState;
+  /* denoiser_state = kDenoiserOnYOnly; */
+/* #if defined(WEBRTC_ARCH_ARM) || defined(WEBRTC_ARCH_ARM64) || defined(ANDROID) */
+  /* denoiser_state = kDenoiserOnYOnly; */
+/* #else */
+  /* denoiser_state = kDenoiserOnAdaptive; */
+/* #endif */
   vpx_codec_control(&encoders_[0], VP8E_SET_NOISE_SENSITIVITY,
                     codec_.VP8()->denoisingOn ? denoiser_state : kDenoiserOff);
   if (encoders_.size() > 2) {
