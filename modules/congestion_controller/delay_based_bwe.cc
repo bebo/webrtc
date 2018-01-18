@@ -101,7 +101,7 @@ DelayBasedBwe::DelayBasedBwe(RtcEventLog* event_log, const Clock* clock)
       consecutive_delayed_feedbacks_(0),
       prev_bitrate_(0),
       prev_state_(BandwidthUsage::kBwNormal) {
-  RTC_LOG(LS_INFO)
+  LOG(LS_INFO)
       << "Using Trendline filter for delay change estimation with window size "
       << trendline_window_size_;
 }
