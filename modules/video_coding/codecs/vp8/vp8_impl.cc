@@ -482,7 +482,7 @@ int VP8EncoderImpl::InitEncode(const VideoCodec* inst,
   } else {
     configurations_[0].kf_mode = VPX_KF_DISABLED;
   }
-  LOG(INFO) << "VP8 complexity: " << inst->VP8().complexity ;
+  RTC_LOG(LS_INFO) << "VP8 complexity: " << inst->VP8().complexity ;
 
   // Allow the user to set the complexity for the base stream.
   switch (inst->VP8().complexity) {

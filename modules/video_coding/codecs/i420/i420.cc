@@ -184,7 +184,7 @@ int I420Decoder::Decode(const EncodedImage& inputImage,
     return WEBRTC_VIDEO_CODEC_UNINITIALIZED;
   }
   if (inputImage._length < kI420HeaderSize) {
-    LOG(LS_ERROR) << "I420Decoder " << inputImage._length;
+    RTC_LOG(LS_ERROR) << "I420Decoder " << inputImage._length;
     return WEBRTC_VIDEO_CODEC_ERROR;
   }
 
@@ -200,7 +200,7 @@ int I420Decoder::Decode(const EncodedImage& inputImage,
       CalcBufferSize(VideoType::kI420, _width, _height) + kI420HeaderSize;
 
   if (req_length > inputImage._length) {
-    LOG(LS_ERROR) << "I420Decoder " << inputImage._length << " < " << req_length;
+    RTC_LOG(LS_ERROR) << "I420Decoder " << inputImage._length << " < " << req_length;
     return WEBRTC_VIDEO_CODEC_ERROR;
   }
   // Set decoded image parameters.

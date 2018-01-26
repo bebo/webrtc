@@ -64,14 +64,18 @@ namespace {
 // RegEnumValue() reports the number of characters from the name that were
 // written to the buffer, not how many there are. This constant is the maximum
 // name size, such that a buffer with this size should read any name.
+#if 0
 const DWORD MAX_REGISTRY_NAME_SIZE = 16384;
+#endif
 
 // Registry values are read as BYTE* but can have wchar_t* data whose last
 // wchar_t is truncated. This function converts the reported |byte_size| to
 // a size in wchar_t that can store a truncated wchar_t if necessary.
+#if 0
 inline DWORD to_wchar_size(DWORD byte_size) {
   return (byte_size + sizeof(wchar_t) - 1) / sizeof(wchar_t);
 }
+#endif
 
 // Mask to pull WOW64 access flags out of REGSAM access.
 const REGSAM kWow64AccessMask = KEY_WOW64_32KEY | KEY_WOW64_64KEY;

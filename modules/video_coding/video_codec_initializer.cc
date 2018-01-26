@@ -108,11 +108,11 @@ VideoCodec VideoCodecInitializer::VideoEncoderConfigToVideoCodec(
 
   switch (config.content_type) {
     case VideoEncoderConfig::ContentType::kRealtimeVideo:
-      LOG(LS_INFO) << "kRealtimeVideo";
+      RTC_LOG(LS_INFO) << "kRealtimeVideo";
       video_codec.mode = kRealtimeVideo;
       break;
     case VideoEncoderConfig::ContentType::kScreen:
-      LOG(LS_INFO) << "kScreen";
+      RTC_LOG(LS_INFO) << "kScreen";
       video_codec.mode = kScreensharing;
       if (!streams.empty() &&
           streams[0].temporal_layer_thresholds_bps.size() == 1) {
