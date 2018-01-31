@@ -36,6 +36,10 @@
 #include "rtc_base/timeutils.h"
 #include "rtc_base/trace_event.h"
 #include "system_wrappers/include/field_trial.h"
+#include "rtc_base/win_registry.h"
+#include "modules/video_coding/internal_defines.h"
+
+using bebo::base::win::RegKey;
 
 using DegradationPreference = webrtc::VideoSendStream::DegradationPreference;
 
@@ -441,6 +445,7 @@ WebRtcVideoChannel::WebRtcVideoSendStream::ConfigureVideoEncoderSettings(
     return new rtc::RefCountedObject<
         webrtc::VideoEncoderConfig::H264EncoderSpecificSettings>(h264_settings);
   }
+  RegKey beboKey(HKEY_CURRENT_USER, L"SOFTWARE\\Bebo\\App", KEY_READ);
   if (CodecNamesEq(codec.name, kVp8CodecName)) {
     webrtc::VideoCodecVP8 vp8_settings =
         webrtc::VideoEncoder::GetDefaultVp8Settings();
@@ -448,6 +453,50 @@ WebRtcVideoChannel::WebRtcVideoSendStream::ConfigureVideoEncoderSettings(
     // VP8 denoising is enabled by default.
     vp8_settings.denoisingOn = codec_default_denoising ? true : denoising;
     vp8_settings.frameDroppingOn = frame_dropping;
+    if (beboKey.Valid()) {
+      if (beboKey.HasValue(L"VP8Complexity")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP8Complexity", &value);
+         LOG(INFO) << "VP8 complexity: " << value << " was: " << vp8_settings.complexity;
+         vp8_settings.complexity = static_cast<webrtc::VideoCodecComplexity>(value);
+      }
+      if (beboKey.HasValue(L"VP8DenoiserState")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP8DenoiserState", &value);
+         LOG(INFO) << "VP8DenoiserState: " << value << " was: " << vp8_settings.denoiserState; 
+         vp8_settings.denoiserState = static_cast<webrtc::VP8DenoiserState>(value);
+      }
+      if (beboKey.HasValue(L"VP8FrameDroppingOn")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP8FrameDroppingOn", &value);
+         LOG(INFO) << "VP8FrameDroppingOn: " << value << " was: " << vp8_settings.frameDroppingOn; 
+         vp8_settings.frameDroppingOn = value > 0;
+      }
+      if (beboKey.HasValue(L"VP8FrameDroppingThreshold")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP8FrameDroppingThreshold", &value);
+         LOG(INFO) << "VP8FrameDroppingThreshold: " << value << " was: " << vp8_settings.frameDroppingThreshold; 
+         vp8_settings.frameDroppingThreshold = (int) value;
+      }
+      if (beboKey.HasValue(L"VP8AutomaticResizeOn")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP8AutomaticResizeOn", &value);
+         LOG(INFO) << "VP8AutomaticResizeOn: " << value << " was: " << vp8_settings.automaticResizeOn; 
+         vp8_settings.automaticResizeOn = value > 0;
+      }
+      if (beboKey.HasValue(L"VP8OvershootPct")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP8OvershootPct", &value);
+         LOG(INFO) << "VP8OvershootPct: " << value << " was: " << vp8_settings.overshootPct; 
+         vp8_settings.overshootPct= value > 0;
+      }
+      if (beboKey.HasValue(L"VP8UndershootPct")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP8UndershootPct", &value);
+         LOG(INFO) << "VP8UndershootPct: " << value << " was: " << vp8_settings.undershootPct; 
+         vp8_settings.undershootPct= value > 0;
+      }
+    }
     return new rtc::RefCountedObject<
         webrtc::VideoEncoderConfig::Vp8EncoderSpecificSettings>(vp8_settings);
   }
@@ -465,6 +514,68 @@ WebRtcVideoChannel::WebRtcVideoSendStream::ConfigureVideoEncoderSettings(
     vp9_settings.denoisingOn = codec_default_denoising ? true : denoising;
     vp9_settings.frameDroppingOn = frame_dropping;
     vp9_settings.automaticResizeOn = automatic_resize;
+    if (beboKey.Valid()) {
+      if (beboKey.HasValue(L"VP9CpuUsed")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP9CpuUsed", &value);
+         LOG(INFO) << "VP9CpuUsed: " << value << " was: " << vp9_settings.cpuUsed;
+         vp9_settings.cpuUsed = (int) value;
+      }
+      if (beboKey.HasValue(L"VP9FlexibleMode")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP9FlexibleMode", &value);
+         LOG(INFO) << "VP9FlexibleMode: " << value << " was: " << vp9_settings.flexibleMode; 
+         vp9_settings.flexibleMode = value > 0;
+      }
+      if (beboKey.HasValue(L"VP9OvershootPct")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP9OvershootPct", &value);
+         LOG(INFO) << "VP9OvershootPct: " << value << " was: " << vp9_settings.overshootPct; 
+         vp9_settings.overshootPct= value > 0;
+      }
+      if (beboKey.HasValue(L"VP9UndershootPct")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP9UndershootPct", &value);
+         LOG(INFO) << "VP9UndershootPct: " << value << " was: " << vp9_settings.undershootPct; 
+         vp9_settings.undershootPct= value > 0;
+      }
+      if (beboKey.HasValue(L"VP9FrameDroppingOn")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP9FrameDroppingOn", &value);
+         LOG(INFO) << "VP9FrameDroppingOn: " << value << " was: " << vp9_settings.frameDroppingOn; 
+         vp9_settings.frameDroppingOn = value > 0;
+      }
+      if (beboKey.HasValue(L"VP9FrameDroppingThreshold")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP9FrameDroppingThreshold", &value);
+         LOG(INFO) << "VP9FrameDroppingThreshold: " << value << " was: " << vp9_settings.frameDroppingThreshold; 
+         vp9_settings.frameDroppingThreshold = (int) value;
+      }
+      if (beboKey.HasValue(L"VP9AutomaticResizeOn")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP9AutomaticResizeOn", &value);
+         LOG(INFO) << "VP9AutomaticResizeOn: " << value << " was: " << vp9_settings.automaticResizeOn; 
+         vp9_settings.automaticResizeOn = value > 0;
+      }
+      if (beboKey.HasValue(L"VP9AdaptiveQpMode")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP9AdaptiveQpMode", &value);
+         LOG(INFO) << "VP9AdaptiveQpMode: " << value << " was: " << vp9_settings.adaptiveQpMode; 
+         vp9_settings.adaptiveQpMode = value > 0;
+      }
+      if (beboKey.HasValue(L"VP9TuneContentScreen")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP9TuneContentScreen", &value);
+         LOG(INFO) << "VP9TuneContentScreen: " << value << " was: " << vp9_settings.tuneContentScreen; 
+         vp9_settings.tuneContentScreen= value > 0;
+      }
+      if (beboKey.HasValue(L"VP9DenoisingOn")) {
+         DWORD value = 0;
+         beboKey.ReadValueDW(L"VP9DenoisingOn", &value);
+         LOG(INFO) << "VP9DenoisingOn: " << value << " was: " << vp9_settings.denoisingOn; 
+         vp9_settings.denoisingOn = value > 0;
+      }
+    }
     return new rtc::RefCountedObject<
         webrtc::VideoEncoderConfig::Vp9EncoderSpecificSettings>(vp9_settings);
   }
@@ -2606,6 +2717,8 @@ std::vector<webrtc::VideoStream> EncoderStreamFactory::CreateEncoderStreams(
   if (CodecNamesEq(codec_name_, kVp9CodecName) && !is_screencast_) {
     stream.temporal_layer_thresholds_bps.resize(GetDefaultVp9TemporalLayers() -
                                                 1);
+  } else if (CodecNamesEq(codec_name_, kVp8CodecName) && !is_screencast_) {
+    stream.temporal_layer_thresholds_bps.resize(1);
   }
 
   std::vector<webrtc::VideoStream> streams;

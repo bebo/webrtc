@@ -10,6 +10,7 @@
 
 #include "api/video_codecs/video_encoder.h"
 
+
 namespace webrtc {
 
 // TODO(mflodman): Add default complexity for VP9 and VP9.
@@ -24,6 +25,11 @@ VideoCodecVP8 VideoEncoder::GetDefaultVp8Settings() {
   vp8_settings.automaticResizeOn = false;
   vp8_settings.frameDroppingOn = true;
   vp8_settings.keyFrameInterval = 3000;
+
+  vp8_settings.denoiserState = kDenoiserOnAdaptive;
+  vp8_settings.frameDroppingThreshold = 60;
+  vp8_settings.undershootPct = 100;
+  vp8_settings.overshootPct = 15;
 
   return vp8_settings;
 }
@@ -41,6 +47,11 @@ VideoCodecVP9 VideoEncoder::GetDefaultVp9Settings() {
   vp9_settings.automaticResizeOn = true;
   vp9_settings.numberOfSpatialLayers = 1;
   vp9_settings.flexibleMode = false;
+
+  vp9_settings.frameDroppingThreshold = 60;
+  vp9_settings.undershootPct = 50;
+  vp9_settings.overshootPct = 50;
+  vp9_settings.cpuUsed = 7;
 
   return vp9_settings;
 }

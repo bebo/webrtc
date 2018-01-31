@@ -304,13 +304,13 @@ int VP9EncoderImpl::InitEncode(const VideoCodec* inst,
   config_->g_lag_in_frames = 0;  // 0- no frame lagging
   config_->g_threads = 1;
   // Rate control settings.
-  config_->rc_dropframe_thresh = inst->VP9().frameDroppingOn ? 30 : 0;
+  config_->rc_dropframe_thresh = inst->VP9().frameDroppingOn ? inst->VP9().frameDroppingThreshold : 0;
   config_->rc_end_usage = VPX_CBR;
   config_->g_pass = VPX_RC_ONE_PASS;
   config_->rc_min_quantizer = 2;
   config_->rc_max_quantizer = 52;
-  config_->rc_undershoot_pct = 50;
-  config_->rc_overshoot_pct = 50;
+  config_->rc_undershoot_pct = inst->VP9().undershootPct;
+  config_->rc_overshoot_pct = inst->VP9().overshootPct;
   config_->rc_buf_initial_sz = 500;
   config_->rc_buf_optimal_sz = 600;
   config_->rc_buf_sz = 1000;
@@ -330,7 +330,8 @@ int VP9EncoderImpl::InitEncode(const VideoCodec* inst,
   config_->g_threads =
       NumberOfThreads(config_->g_w, config_->g_h, number_of_cores);
 
-  cpu_speed_ = GetCpuSpeed(config_->g_w, config_->g_h);
+  //cpu_speed_ = GetCpuSpeed(config_->g_w, config_->g_h);
+  cpu_speed_ = inst->VP9().cpuUsed;
 
   // TODO(asapersson): Check configuration of temporal switch up and increase
   // pattern length.
@@ -379,8 +380,9 @@ int VP9EncoderImpl::NumberOfThreads(int width,
                                     int height,
                                     int number_of_cores) {
   // Keep the number of encoder threads equal to the possible number of column
-  // tiles, which is (1, 2, 4, 8). See comments below for VP9E_SET_TILE_COLUMNS.
-  if (width * height >= 1280 * 720 && number_of_cores > 4) {
+  if (width * height >= 1920 * 1080 && number_of_cores > 8) {
+    return 8;
+  } else if (width * height >= 1280 * 720 && number_of_cores > 4) {
     return 4;
   } else if (width * height >= 640 * 360 && number_of_cores > 2) {
     return 2;
@@ -460,7 +462,8 @@ int VP9EncoderImpl::InitAndSetControlSettings(const VideoCodec* inst) {
                     inst->VP9().denoisingOn ? 1 : 0);
 #endif
 
-  if (codec_.mode == kScreensharing) {
+  if (inst->VP9().tuneContentScreen) {
+  /* if (codec_.mode == kScreensharing) { */
     // Adjust internal parameters to screen content.
     vpx_codec_control(encoder_, VP9E_SET_TUNE_CONTENT, 1);
   }

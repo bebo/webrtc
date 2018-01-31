@@ -425,6 +425,17 @@ enum VP8ResilienceMode {
                      // within a frame.
 };
 
+// VP8 denoiser states.
+enum VP8DenoiserState {
+  kDenoiserOff,
+  kDenoiserOnYOnly,
+  kDenoiserOnYUV,
+  kDenoiserOnYUVAggressive,
+  // Adaptive mode defaults to kDenoiserOnYUV on key frame, but may switch
+  // to kDenoiserOnYUVAggressive based on a computed noise metric.
+  kDenoiserOnAdaptive
+};
+
 class TemporalLayersFactory;
 // VP8 specific
 struct VideoCodecVP8 {
@@ -434,10 +445,14 @@ struct VideoCodecVP8 {
   VP8ResilienceMode resilience;
   unsigned char numberOfTemporalLayers;
   bool denoisingOn;
+  VP8DenoiserState denoiserState;
   bool errorConcealmentOn;
   bool automaticResizeOn;
   bool frameDroppingOn;
+  int frameDroppingThreshold;
   int keyFrameInterval;
+  int undershootPct;
+  int overshootPct;
   TemporalLayersFactory* tl_factory;
 };
 
@@ -448,10 +463,15 @@ struct VideoCodecVP9 {
   unsigned char numberOfTemporalLayers;
   bool denoisingOn;
   bool frameDroppingOn;
+  int frameDroppingThreshold;
   int keyFrameInterval;
   bool adaptiveQpMode;
   bool automaticResizeOn;
+  bool tuneContentScreen;
   unsigned char numberOfSpatialLayers;
+  int undershootPct;
+  int overshootPct;
+  int cpuUsed;
   bool flexibleMode;
 };
 
