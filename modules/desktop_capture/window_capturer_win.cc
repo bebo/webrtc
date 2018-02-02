@@ -71,6 +71,7 @@ BOOL CALLBACK WindowsEnumerationHandler(HWND hwnd, LPARAM param) {
   // Truncate the title if it's longer than kTitleLength.
   GetWindowText(hwnd, window_title, kTitleLength);
   window.title = rtc::ToUtf8(window_title);
+  window.class_name = rtc::ToUtf8(class_name);
 
   // Skip windows when we failed to convert the title or it is empty.
   if (window.title.empty())

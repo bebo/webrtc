@@ -70,6 +70,8 @@ class DesktopCapturer {
     // Title of the window or screen in UTF-8 encoding, maybe empty. This field
     // should not be used to identify a source.
     std::string title;
+
+    std::string class_name;
   };
 
   typedef std::vector<Source> SourceList;
