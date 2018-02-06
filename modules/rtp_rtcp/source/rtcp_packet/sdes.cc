@@ -50,6 +50,8 @@ namespace {
 const uint8_t kTerminatorTag = 0;
 const uint8_t kCnameTag = 1;
 
+const int kThrottleRatio = 2000;
+
 size_t ChunkSize(const Sdes::Chunk& chunk) {
   // Chunk:
   // SSRC/CSRC (4 bytes) | CNAME=1 (1 byte) | length (1 byte) | cname | padding.
@@ -59,9 +61,12 @@ size_t ChunkSize(const Sdes::Chunk& chunk) {
 }
 }  // namespace
 
-Sdes::Sdes() : block_length_(RtcpPacket::kHeaderLength) {}
+Sdes::Sdes() : block_length_(RtcpPacket::kHeaderLength), unexpected_eof_count_(0) {}
 
-Sdes::~Sdes() {}
+Sdes::~Sdes() {
+  RTC_LOG(INFO) << "Sdes stats: unexpected_eof_count_: " 
+    << unexpected_eof_count_;
+}
 
 bool Sdes::Parse(const CommonHeader& packet) {
   RTC_DCHECK_EQ(packet.type(), kPacketType);
@@ -95,17 +100,21 @@ bool Sdes::Parse(const CommonHeader& packet) {
     uint8_t item_type;
     while ((item_type = *(looking_at++)) != kTerminatorTag) {
       if (looking_at >= payload_end) {
-        RTC_LOG(LS_WARNING)
+        if (++unexpected_eof_count % kThrottleRatio == 0) {
+          RTC_LOG(LS_WARNING)
             << "Unexpected end of packet while reading chunk #" << (i + 1)
             << ". Expected to find size of the text.";
+        }
         return false;
       }
       uint8_t item_length = *(looking_at++);
       const size_t kTerminatorSize = 1;
       if (looking_at + item_length + kTerminatorSize > payload_end) {
-        RTC_LOG(LS_WARNING)
+        if (++unexpected_eof_count % kThrottleRatio == 0) {
+          RTC_LOG(LS_WARNING)
             << "Unexpected end of packet while reading chunk #" << (i + 1)
             << ". Expected to find text of size " << item_length;
+        }
         return false;
       }
       if (item_type == kCnameTag) {

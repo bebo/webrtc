@@ -50,6 +50,8 @@ class Sdes : public RtcpPacket {
  private:
   std::vector<Chunk> chunks_;
   size_t block_length_;
+
+  uint64_t unexpected_eof_count_;
 };
 }  // namespace rtcp
 }  // namespace webrtc
