@@ -27,8 +27,12 @@
 namespace webrtc {
 
 namespace {
+#if 0
 const int kMessagesThrottlingThreshold = 100;
 const int kThrottleRatio = 1000;
+#endif
+const int kMessagesThrottlingThreshold = 1;
+const int kThrottleRatio = 60000;
 }  // namespace
 
 VCMGenericEncoder::VCMGenericEncoder(
