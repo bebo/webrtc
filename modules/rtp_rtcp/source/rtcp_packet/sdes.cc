@@ -100,7 +100,7 @@ bool Sdes::Parse(const CommonHeader& packet) {
     uint8_t item_type;
     while ((item_type = *(looking_at++)) != kTerminatorTag) {
       if (looking_at >= payload_end) {
-        if (++unexpected_eof_count % kThrottleRatio == 0) {
+        if (++unexpected_eof_count_ % kThrottleRatio == 0) {
           RTC_LOG(LS_WARNING)
             << "Unexpected end of packet while reading chunk #" << (i + 1)
             << ". Expected to find size of the text.";
@@ -110,7 +110,7 @@ bool Sdes::Parse(const CommonHeader& packet) {
       uint8_t item_length = *(looking_at++);
       const size_t kTerminatorSize = 1;
       if (looking_at + item_length + kTerminatorSize > payload_end) {
-        if (++unexpected_eof_count % kThrottleRatio == 0) {
+        if (++unexpected_eof_count_ % kThrottleRatio == 0) {
           RTC_LOG(LS_WARNING)
             << "Unexpected end of packet while reading chunk #" << (i + 1)
             << ". Expected to find text of size " << item_length;
